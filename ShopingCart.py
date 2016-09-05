@@ -3,7 +3,7 @@
 # Auther: Yooma
 import sys
 import time,datetime
-import shoping_login
+import ShopingLogin
 import getpass
 FMT='%Y%m%d%H%M%S'
 
@@ -179,7 +179,7 @@ def BuySomeThings(GetInputBuyNumber,shoplist,GetCountBuyInput=0):
 #BuySomeThings()
 
 if __name__ == '__main__':
-    print(("\033[34;1mWelcome to JingDongFather Shoping Center\033[0m").center(60, '-'))
+    print("\033[34;1m----------Welcome to JingDongFather Shoping Center----------\033[0m")
     LoginJDMall()
     Money = int(input("\033[34;1mPlease Input your assets:\033[0m"))
     Hmoney = Money
