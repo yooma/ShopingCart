@@ -55,9 +55,9 @@ ColorEnd = '\033[0m'
 def LoginJDMall():
     InputUserName = input(Blue+"Input username:"+ColorEnd )
     InputPassWord = getpass.getpass(Blue+"Input password:"+ColorEnd)
-    shoping_login.ShopingLoginApi(InputUserName, InputPassWord)
+    ShopingLogin.ShopingLoginApi(InputUserName, InputPassWord)
     SeeBeforeBougth = input(Blue+"You want to look before bought list?[y|n]:"+ColorEnd)
-    if SeeBeforeBougth is not '' and SeeBeforeBougth == "y":
+    if SeeBeforeBougth is '' or SeeBeforeBougth == "y":
         print(Blue+"<---------------Historical shopping information--------------->"+ColorEnd)
         ReadShopCart()
 
@@ -98,36 +98,49 @@ def EchoShopList(shoplist,oldshoplist):
                 ListDict = ListDict + '\t' + str(k) + '.' + ' %s\n' % (list(v.keys())[0])
         while 1:
             InputBuyNum = input("\033[36;1m%sInput goods number:\033[0m" % ListDict)
-            if InputBuyNum is not '' and InputBuyNum != "b" and InputBuyNum != "q":
+            if InputBuyNum != '' and InputBuyNum != "b" and InputBuyNum != "q":
                 if BottomDict is not int:
                     BuySomeThings(InputBuyNum,shoplist)
                     break
                 else:
-                    CountBuyInput = input("\033[36;1mInput buy count:\033[0m")
+                    CountBuyInput = input(Green+"Input buy count:"+ColorEnd)
                     BuySomeThings(InputBuyNum, shoplist, CountBuyInput)
                     break
             elif InputBuyNum == "b":
                 EchoShopList(ShopList, shoplist)
                 break
+            elif InputBuyNum == "q":
+                print(Blue+"-----------<Welcome to JDFather mall again>-----------\033[0m"+ColorEnd)
+                sys.exit()
             else:
-                print("\033[33;1m******[Warning] Your input cannot empty.******\033[0m")
+                print(Red+"[Input Error]: Cannot empty!"+ColorEnd)
                 continue
     else:
-        for k,v in oldshoplist.items():
-            #print(list(v.keys())[0])
-            ListDict = ListDict + '\t' + str(k) + '.' + ' %s %s\n' % (list(v.keys())[0],list(v.values())[0])
-        InputBuyNum = input("\033[36;1m%sInput buy number:\033[0m" % ListDict)
-        if InputBuyNum == "b":
-            EchoShopList(ShopList, shoplist)
-        elif InputBuyNum == "q":
-            print("\033[34;1m-----------------<ShopingCartList>-----------------\033[0m")
-            UpdateShopCart(ShopCart)
-            ReadShopCart()
-            print("\033[34;1m-----------<Welcome to JDFather mall again>-----------\033[0m")
-            sys.exit()
-        else:
-            CountBuyInput = input("\033[36;1mInput buy count:\033[0m")
-            BuySomeThings(InputBuyNum,oldshoplist,CountBuyInput)
+        while 1:
+            for k,v in oldshoplist.items():
+                #print(list(v.keys())[0])
+                ListDict = ListDict + '\t' + str(k) + '.' + ' %s %s\n' % (list(v.keys())[0],list(v.values())[0])
+            InputBuyNum = input("\033[36;1m%sInput buy number:\033[0m" % ListDict)
+            if InputBuyNum == "b":
+                EchoShopList(ShopList, shoplist)
+                break
+            elif InputBuyNum == "q":
+                print(Blue+"-----------------<ShopingCartList>-----------------"+ColorEnd)
+                UpdateShopCart(ShopCart)
+                ReadShopCart()
+                print(Blue+"-----------<Welcome to JDFather mall again>-----------"+ColorEnd)
+                sys.exit()
+            elif InputBuyNum == '':
+                print(Red+"[Input Error]: Cannot empty!"+ColorEnd)
+                EchoShopList(ShopList, shoplist)
+            else:
+                try:
+                    CountBuyInput = int(input(Green+"Input buy count:"+ColorEnd))
+                    BuySomeThings(InputBuyNum,oldshoplist,CountBuyInput)
+                except ValueError:
+                    print(Red + "[ ValueError ]: Mast input int type." + ColorEnd)
+                    EchoShopList(ShopList, shoplist)
+
         #print("i am oldshoplist %s" % oldshoplist)
 
 def BuySomeThings(GetInputBuyNumber,shoplist,GetCountBuyInput=0):
@@ -160,30 +173,41 @@ def BuySomeThings(GetInputBuyNumber,shoplist,GetCountBuyInput=0):
                     EchoShopList(SendVlues, shoplist)
                 else:
                     print("\033[34;1mYou don't have enough money to buy %s.\n\tYou has only [\033[31;1m%sRMB\033[0m\033[34;1m]\033[0m" % (list(v.keys())[0],Money))
-                    QueRen = input("\033[34;1mDo you want to recharge now?[y|n]:\033[0m")
-                    if QueRen == "y":
-                        RechargeInput = int(input("\033[34;1mInput the amount you want to recharge:"))
-                        if RechargeInput > 0:
-                            ChongZhi = RechargeInput
-                            Recharge(RechargeInput)
-                            print("\033[34;1mRecharge [\033[0m\033[31;1m%s\033[0m\033[34;1m] success,now you has [\033[0m\033[31;1m%s\033[0m\033[34;1mRMB]\033[0m" % (RechargeInput,Money))
+                    try:
+                        QueRen = input("\033[34;1mDo you want to recharge now?[y|n]:\033[0m")
+                        if QueRen == '' or  QueRen == "y":
+                            try:
+                                RechargeInput = int(input("\033[34;1mInput the amount you want to recharge:"))
+                                if RechargeInput != '' and RechargeInput > 0:
+                                    ChongZhi = RechargeInput
+                                    Recharge(RechargeInput)
+                                    print("\033[34;1mRecharge [\033[0m\033[31;1m%s\033[0m\033[34;1m] success,now you has [\033[0m\033[31;1m%s\033[0m\033[34;1mRMB]\033[0m" % (RechargeInput,Money))
+                                    EchoShopList(SendVlues, shoplist)
+                            except ValueError:
+                                print(Red + "[ ValueError ]: Mast input int type." + ColorEnd)
+                                EchoShopList(SendVlues, shoplist)
+                                break
+                        else:
                             EchoShopList(SendVlues, shoplist)
+                            break
+                    except ValueError:
+                        print(Red + "[ ValueError ]: Mast input int type." + ColorEnd)
+
             else:
                 EchoShopList(SendVlues,shoplist)
-#        elif str(GetInputBuyNumber) == 'b':
-#            EchoShopList(ShopList, shoplist)
-#        elif str(GetInputBuyNumber) == 'q':
-#            sys.exit("\033[31;1m@@@@@@@@^~^byebye^~^@@@@@@@@\033[0m")
         else:
             continue
-#BuySomeThings()
 
 if __name__ == '__main__':
-    print("\033[34;1m----------Welcome to JingDongFather Shoping Center----------\033[0m")
+    print(Blue+"----------Welcome to JingDongFather Shoping Center----------"+ColorEnd)
     LoginJDMall()
-    Money = int(input("\033[34;1mPlease Input your assets:\033[0m"))
-    Hmoney = Money
-
+    while 1:
+        try:
+            Money = int(input(Blue+"Please Input your assets:"+ColorEnd))
+            Hmoney = Money
+            break
+        except ValueError:
+            print(Red+"[ ValueError ]: Mast input int type."+ColorEnd)
     ChongZhi = 0
     ShopCart = {}
     EchoShopList(ShopList,ShopList)
